@@ -54,6 +54,33 @@ class EvidenceTests(unittest.TestCase):
         self.assertFalse(first["coverage"]["runtime_executed"])
         self.assertFalse(first["coverage"]["complete_functionality_claimed"])
 
+    def test_named_static_behavior_hypotheses_keep_evidence_and_inference_labels(self):
+        engine = self.engine()
+        caller = engine["methods"][0]["id"]
+        engine["calls"] = [
+            {"caller": caller, "callee": "Ljava/net/URL;->openConnection()Ljava/net/URLConnection;",
+             "source": "classes.dex", "offset": 40},
+            {"caller": caller, "callee": "Ljavax/crypto/Cipher;->getInstance(Ljava/lang/String;)Ljavax/crypto/Cipher;",
+             "source": "classes.dex", "offset": 50},
+            {"caller": caller, "callee": "Ldalvik/system/DexClassLoader;-><init>()V",
+             "source": "classes.dex", "offset": 60},
+        ]
+        result = build_evidence(self.inspection(), [engine], self.root)
+        by_id = {item["id"]: item for item in result["functionality"]}
+        self.assertTrue({"network_requests", "cryptography", "dynamic_code"}.issubset(by_id))
+        for key in ("network_requests", "cryptography", "dynamic_code"):
+            item = by_id[key]
+            self.assertEqual(item["basis"], "inferred")
+            self.assertFalse(item["runtime_verified"])
+            finding = next(x for x in result["findings"] if x["id"] == item["finding_ids"][0])
+            self.assertEqual(finding["basis"], "inferred")
+            self.assertTrue(finding["evidence"])
+
+        engine["calls"] = []
+        negative = build_evidence(self.inspection(), [engine], self.root)
+        self.assertFalse({"network_requests", "cryptography", "dynamic_code"} &
+                         {item["id"] for item in negative["functionality"]})
+
     def test_manifest_permission_is_not_runtime_behavior(self):
         result = build_evidence(self.inspection(), [], self.root)
         self.assertFalse(result["functionality"])

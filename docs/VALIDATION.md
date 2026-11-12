@@ -16,13 +16,27 @@ The skipped test was checked separately using pytest's `-rs` reporting. Its reco
 
 > Frida native backend could not start its local helper on this host (idund, signal 11); no runtime observation was completed.
 
+### M00 scope gate — 12 November 2026
+
+M00 was closed for the bounded APK-GOD 0.2 commitment set: 66 feature rows across the twenty reference snapshots (47 candidate, 19 deferred) and 14 first-party product rows (13 candidate, one deferred). Every candidate has a named action, target/input boundary, output semantics, module, provenance choice, fixture/case definition, evidence location and platform scope. The inventory covers promises in `docs/CAPABILITIES.md`; it does not claim exhaustive upstream feature parity. Broader or unreviewed upstream capabilities are outside the 0.2 denominator unless added through a later scoped ledger change. The renderer validates row completeness, reference joins, test-node citations, candidate status, and synchronization with the generated matrix.
+
+SQ-04, SQ-07, SQ-08 and SQ-09 remain downstream target/support/benchmark/model decisions for M02, M01, M10 and M08. Native debugger work (SQ-06) and broader rule/module/API families are explicitly deferred. These decisions do not prevent M01.
+
 ### Resume checkout on Windows — 12 November 2026
 
-This continuation ran from a clean Windows checkout with Python **3.13.17** at `C:\Users\~MaNBiR~\dev\python-embed\python.exe`. The `py` launcher and Python 3.12 were unavailable, and there was no project virtual environment. The command `python -m pytest -q -rs` exited before test collection with:
+This continuation ran from a clean Windows checkout with Python **3.13.17** at `[local Python executable]`. The `py` launcher and Python 3.12 were unavailable, and there was no project virtual environment. The command `python -m pytest -q -rs` exited before test collection with:
 
 > `No module named pytest`
 
 No Windows project tests ran. This does not supersede or reproduce the Linux result above. M00 ledger structure and the generated Markdown synchronization were checked separately with `python scripts/render_feature_matrix.py` and `python scripts/render_feature_matrix.py --check`.
+
+At the user's request, `uv` then created a project-local `.venv` and installed the `analysis` and `dev` extras from `https://pypi.org/simple`; the computer was not restarted. The first sandboxed pytest attempt failed because Windows denied loopback socket access in the dashboard and local-provider tests. Re-running with local loopback permission completed the suite:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q -rs
+```
+
+Result: **51 passed, 6 skipped in 4.70 seconds** on Windows / Python 3.13.17. Skips were the Linux-only ELF fixture, optional local real-DEX fixture, Linux-only Frida native hook fixture, and three optional angr cases (angr was not installed in this `analysis,dev` environment). This confirms the applicable suite on the existing Windows host; it is not a clean Windows installation test on Python 3.12. The initial loopback-denied run is not counted as a product test result.
 
 Installed dependencies and device execution are separate facts. The local availability check found Androguard 4.1.3, LIEF 0.17.6, Capstone 5.0.9, Frida 17.26.2 and angr 9.3.4. Presence of those libraries does not imply that every optional feature or target works.
 
