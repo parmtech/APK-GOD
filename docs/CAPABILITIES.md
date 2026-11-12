@@ -2,6 +2,8 @@
 
 This is a functionality comparison, not a claim that all code or features of a reference project have been incorporated. The original product code calls embedded library APIs; none of the twenty reference CLIs are launched. "Implemented" means the named slice exists, not full upstream parity.
 
+The feature-level acceptance inventory is tracked in [FEATURE_MATRIX.md](FEATURE_MATRIX.md), with machine-readable records in [feature_ledger.json](feature_ledger.json). The M00 inventory is a draft across the twenty targeted source snapshots plus first-party APK-GOD promises. It is not a full upstream audit, release-version pin set, completion percentage, or proof that every listed behavior has passed acceptance.
+
 | Reference project | Capability represented in APK-GOD now | Material remaining scope |
 |---|---|---|
 | JADX | Java-like reconstruction, class/method/source index through embedded DAD | JADX-specific decompiler passes, Kotlin/resource presentation and full JADX parity |

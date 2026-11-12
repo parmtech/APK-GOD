@@ -16,6 +16,14 @@ The skipped test was checked separately using pytest's `-rs` reporting. Its reco
 
 > Frida native backend could not start its local helper on this host (idund, signal 11); no runtime observation was completed.
 
+### Resume checkout on Windows — 12 November 2026
+
+This continuation ran from a clean Windows checkout with Python **3.13.17** at `C:\Users\~MaNBiR~\dev\python-embed\python.exe`. The `py` launcher and Python 3.12 were unavailable, and there was no project virtual environment. The command `python -m pytest -q -rs` exited before test collection with:
+
+> `No module named pytest`
+
+No Windows project tests ran. This does not supersede or reproduce the Linux result above. M00 ledger structure and the generated Markdown synchronization were checked separately with `python scripts/render_feature_matrix.py` and `python scripts/render_feature_matrix.py --check`.
+
 Installed dependencies and device execution are separate facts. The local availability check found Androguard 4.1.3, LIEF 0.17.6, Capstone 5.0.9, Frida 17.26.2 and angr 9.3.4. Presence of those libraries does not imply that every optional feature or target works.
 
 ### What the tests exercise

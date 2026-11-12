@@ -63,11 +63,15 @@ Retained standard-profile evidence from the pinned `hello-world.apk` indexed 2,1
 
 The five main installed engines were Androguard 4.1.3, LIEF 0.17.6, Capstone 5.0.9, Frida 17.26.2 and angr 9.3.4. `doctor` reports installation availability, not successful execution of every capability.
 
+## Current Windows resume-host check
+
+On **12 November 2026**, this clean Windows checkout exposed Python **3.13.17** from `C:\Users\~MaNBiR~\dev\python-embed\python.exe`. `py` and Python 3.12 were not available, no project virtual environment existed, and `python -m pytest -q -rs` stopped before collection with `No module named pytest`. This is **not a test-suite result** and does not change the historical Linux result above. The feature-ledger renderer/structural validation did pass on this host; see `scripts/render_feature_matrix.py`.
+
 ## Exact next work
 
-**First:** expand the twenty-row capability comparison into a feature-level acceptance inventory. For each promised feature, record its reference, expected behavior, APK-GOD module, fixture, pass/fail criterion and evidence. Do not report a measured completion percentage before a stable denominator exists. The conversational 15–20% estimate was a rough planning judgment, not an audited metric.
+**First (still open):** finish M00 against [docs/FEATURE_MATRIX.md](docs/FEATURE_MATRIX.md) and [docs/feature_ledger.json](docs/feature_ledger.json). The current draft lists 61 scoped features across all twenty source-study snapshots and 14 first-party APK-GOD features. It records exact snapshot commits, actions, constraints, expected output, modules, provenance choices, fixtures, acceptance procedures, evidence, statuses and platform scope. These commits identify reviewed source states, not released dependency versions; the targeted source review is not a full upstream audit. Resolve or explicitly bound the open scope families and SQ-01 through SQ-10, and turn future fixture procedures into stable owned fixtures and automated cases before closing M00. No completion percentage is supported.
 
-**Next executable verification:** run the existing dashboard in a real browser and record upload, progress, report/source download, failure handling and persistent history. Follow with a clean Windows or WSL installation test. HTTP-only tests do not cover JavaScript or rendered layout.
+**After M00:** run the dashboard in a real browser and record upload, progress, report/source download, failure handling, profiles, history, theme, viewport and keyboard behavior. Follow with a clean Windows or WSL installation test. HTTP-only tests do not cover JavaScript or rendered layout. This remains the M01 gate, not a completed result.
 
 **Parallel environment work:** establish a compatible, explicitly selected Android test device/emulator and verify Frida process/module observation on an owned test app. Record host/device versions and actual success or failure. Keep the current static analysis usable while this gate remains blocked.
 
