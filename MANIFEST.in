@@ -1,0 +1,6 @@
+include README.md ARCHITECTURE.md LICENSE THIRD_PARTY_NOTICES.md
+recursive-include apk_god/static *.html
+recursive-include docs *.md
+recursive-include third_party *.json *.txt *.md
+recursive-include scripts *.py *.sh *.ps1
+recursive-include tests *.py

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "apk-god"
+version = "0.2.0"
+description = "Integrated Android application analysis with embedded engines and traceable evidence"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "APK GOD contributors"}]
+dependencies = []
+
+[project.optional-dependencies]
+analysis = ["androguard==4.1.3", "lief==0.17.6", "capstone==5.0.9"]
+runtime = ["frida==17.26.2"]
+symbolic = ["angr==9.3.4", "bitstring==4.4.0", "pycparser==3.0"]
+dev = ["pytest>=8,<9", "build>=1,<2"]
+full = ["androguard==4.1.3", "lief==0.17.6", "capstone==5.0.9", "frida==17.26.2", "angr==9.3.4", "bitstring==4.4.0", "pycparser==3.0"]
+
+[project.scripts]
+apk-god = "apk_god.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["apk_god*"]
+
+[tool.setuptools.package-data]
+apk_god = ["static/*.html"]
