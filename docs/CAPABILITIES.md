@@ -2,7 +2,7 @@
 
 This is a functionality comparison, not a claim that all code or features of a reference project have been incorporated. The original product code calls embedded library APIs; none of the twenty reference CLIs are launched. "Implemented" means the named slice exists, not full upstream parity.
 
-The feature-level acceptance inventory is tracked in [FEATURE_MATRIX.md](FEATURE_MATRIX.md), with machine-readable records in [feature_ledger.json](feature_ledger.json). The M00 inventory is a draft across the twenty targeted source snapshots plus first-party APK-GOD promises. It is not a full upstream audit, release-version pin set, completion percentage, or proof that every listed behavior has passed acceptance.
+The feature-level acceptance inventory is tracked in [FEATURE_MATRIX.md](FEATURE_MATRIX.md), with machine-readable records in [feature_ledger.json](feature_ledger.json). M00 is complete for the bounded 0.2 commitments named here and in the first-party product records: 66 reference-feature rows plus 14 product rows, with candidate and deferred scope visible. The inventory uses twenty exact source-study snapshots, not release/dependency pins. It is not an exhaustive upstream audit, completion percentage or proof that each candidate behavior has passed acceptance.
 
 | Reference project | Capability represented in APK-GOD now | Material remaining scope |
 |---|---|---|
@@ -33,7 +33,7 @@ APK-GOD supplies its own bounded transactions, normalized evidence graph, source
 
 ## Readiness gates
 
-The project cannot be described as meeting the full twenty-project goal until each requested feature has a concrete acceptance case and the corresponding implementation passes it. Remaining gates include a configured Android runtime, full rebuild/round-trip testing, proxy collection, native debugger behavior, real Windows installation tests, obfuscation/packing samples, and benchmarks against the exact source APK/build pair supplied by the owner.
+The project cannot be described as meeting the full twenty-project goal until the broader requested features have concrete acceptance cases and corresponding implementation evidence; the 0.2 inventory bounds only the commitments listed here. Remaining gates include a configured Android runtime, full rebuild/round-trip testing, proxy collection, native debugger behavior, real Windows installation tests, obfuscation/packing samples, and benchmarks against the exact source APK/build pair supplied by the owner.
 
 The owner's Tong Radio APK was reserved for later benchmarking. It was not silently substituted for a test fixture during this build.
 

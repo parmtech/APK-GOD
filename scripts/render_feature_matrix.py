@@ -16,32 +16,39 @@ STATUSES = {"proposed", "implemented-unverified", "verified-with-limits", "block
 def render(data: dict) -> str:
     lines = [
         "# Feature acceptance inventory — APK-GOD 0.2", "",
-        "**Draft 0.1 — 12 November 2026.** This inventory scopes capabilities promised or explicitly planned in this repository. It is not an exhaustive feature catalog of the twenty upstream projects and does not establish a completion percentage.", "",
+        f"**Inventory {data['inventory_version']} - 12 November 2026.** This inventory scopes APK-GOD 0.2 commitments. It is not an exhaustive feature catalog of the twenty upstream projects and does not establish a completion percentage.", "",
         "## Reading the inventory", "",
         "The machine-readable source is [`feature_ledger.json`](feature_ledger.json). Reference IDs join to exact source-study commits in [`SOURCE_REVIEW.md`](SOURCE_REVIEW.md); those commits identify reviewed snapshots, not released versions or dependency pins. The source review sampled entrypoints, and some upstream repositories were only partly materialized. `platform_scope` distinguishes Android work from broader JVM/native work.", "",
         "`verified-with-limits` means the named bounded slice has test evidence; `implemented-unverified` means the needed target behavior is not verified; `blocked` records a target/environment gap; `proposed` is scoped but not complete; `not-implemented` means absent. Future procedures are not existing tests. Add automated fixture tests before upgrading a status.", "",
         "## Twenty reference projects", "",
-        "| ID | Reference snapshot | Feature / pass criterion | Module | Fixture and acceptance case | Evidence | Platform | Status |",
-        "|---|---|---|---|---|---|---|---|",
+        "| ID | Reference snapshot | Feature / pass criterion | Module | Fixture and acceptance case | Evidence | Platform | Candidate scope | Status |",
+        "|---|---|---|---|---|---|---|---|---|",
     ]
     for f in data["features"]:
         sha = f["reference_version"].removeprefix("commit:")[:12]
-        lines.append(f"| {f['id']} | {f['reference_id']} (`{sha}`) | {f['feature']}; {f['expected_output_semantics']} | `{f['planned_apkgod_module']}` | {f['fixture']}; {f['acceptance_case']} | {f['evidence_location']} | {f['platform_scope']} | `{f['status']}` |")
+        lines.append(f"| {f['id']} | {f['reference_id']} (`{sha}`) | {f['feature']}; {f['expected_output_semantics']} | `{f['planned_apkgod_module']}` | {f['fixture']}; {f['acceptance_case']} | {f['evidence_location']} | {f['platform_scope']} | `{f['candidate_scope']}` | `{f['status']}` |")
     lines += ["", "## APK-GOD product features", "",
         "These records describe first-party promises and are not attributed to an upstream project.", "",
-        "| ID | Version | Feature / pass criterion | Module | Fixture and acceptance case | Evidence | Platform | Status |",
-        "|---|---|---|---|---|---|---|---|"]
+        "| ID | Version | Feature / pass criterion | Module | Fixture and acceptance case | Evidence | Platform | Candidate scope | Status |",
+        "|---|---|---|---|---|---|---|---|---|"]
     for f in data["product_features"]:
-        lines.append(f"| {f['id']} | {f['reference_version']} | {f['feature']}; {f['expected_output_semantics']} | `{f['planned_apkgod_module']}` | {f['fixture']}; {f['acceptance_case']} | {f['evidence_location']} | {f['platform_scope']} | `{f['status']}` |")
+        lines.append(f"| {f['id']} | {f['reference_version']} | {f['feature']}; {f['expected_output_semantics']} | `{f['planned_apkgod_module']}` | {f['fixture']}; {f['acceptance_case']} | {f['evidence_location']} | {f['platform_scope']} | `{f['candidate_scope']}` | `{f['status']}` |")
     lines += ["", "## Provenance and evidence rules", "",
         "- Prefer original APK-GOD modules and direct embedded APIs. External CLI launchers do not satisfy the product architecture. Preserve third-party provenance and terms; do not include upstream scanner rules without review.",
         "- Keep static evidence, runtime observations, imported HAR data, symbolic paths, inference, and optional AI output distinct. A manifest declaration is not runtime behavior; a model witness is not execution; readable output is not recovered original source.",
         "- Every record names its expected action, input/target bounds, output semantics, module, fixture, acceptance case, evidence location, and platform scope.", "",
         "## Open scope questions", ""]
     for q in data["scope_questions"]:
-        lines.append(f"- **{q['id']}** {q['question']} {q['reason']}")
+        state = "Resolved" if q.get("status") == "resolved" else "Open"
+        detail = q.get("resolution", q["reason"])
+        lines.append(f"- **{state} — {q['id']}** {q['question']} {detail}")
+    open_ids = [q["id"] for q in data["scope_questions"] if q.get("status") != "resolved"]
+    candidate_refs = sum(f["candidate_scope"] == "candidate" for f in data["features"])
+    deferred_refs = sum(f["candidate_scope"] == "deferred" for f in data["features"])
+    candidate_product = sum(f["candidate_scope"] == "candidate" for f in data["product_features"])
+    deferred_product = sum(f["candidate_scope"] == "deferred" for f in data["product_features"])
     lines += ["", "## M00 gate state", "",
-        "This inventory names scoped features across all twenty source snapshots plus first-party APK-GOD features. **M00 remains the first open gate:** unresolved families need explicit scope decisions, and future acceptance procedures still need stable owned fixtures and automated tests. Do not advance to M01 as the next gate until M00 acceptance is closed; independent M01 work may proceed in parallel only when separately requested/authorized. No coverage percentage or full-parity claim is supported.", ""]
+        f"**M00 is complete for the bounded APK-GOD 0.2 scope.** The denominator is {candidate_refs + deferred_refs} reference rows ({candidate_refs} candidates and {deferred_refs} explicit deferrals) plus {candidate_product + deferred_product} first-party product rows ({candidate_product} candidates and {deferred_product} deferred). All candidates have finite acceptance specifications; fixtures and execution belong to their implementation milestones. The source review is targeted, so this does not claim exhaustive upstream coverage, full parity or a completion percentage. Open downstream questions {', '.join(open_ids)} remain assigned to M01, M02/M05, M08 and M10 as appropriate. **M01 is the next gate.**", ""]
     return "\n".join(lines)
 
 
@@ -77,6 +84,10 @@ def validate(data: dict) -> None:
             raise ValueError(f"{f['id']}: reference/version does not join")
         if f["candidate_scope"] == "unresolved" and not f.get("scope_question_id"):
             raise ValueError(f"{f['id']}: unresolved scope needs a question ID")
+        if f["candidate_scope"] not in {"candidate", "deferred", "unresolved"}:
+            raise ValueError(f"{f['id']}: invalid candidate_scope")
+        if f["candidate_scope"] == "candidate" and len(f["acceptance_case"].strip()) < 20:
+            raise ValueError(f"{f['id']}: candidate acceptance case is not specific enough")
         for path, class_name, method in re.findall(
             r"(tests/[A-Za-z0-9_./-]+\.py)::([A-Za-z_][A-Za-z0-9_]*)::(test_[A-Za-z0-9_]*)",
             f["evidence_location"],
@@ -91,6 +102,12 @@ def validate(data: dict) -> None:
     covered = {f["reference_id"] for f in data["features"]}
     if covered != set(ref_versions):
         raise ValueError(f"Every reference needs a feature; missing {sorted(set(ref_versions)-covered)}")
+    if any(q.get("status") not in {"open", "resolved"} for q in data["scope_questions"]):
+        raise ValueError("Every scope question needs an open/resolved status.")
+    if any(q["id"] == "SQ-03" and q.get("status") != "resolved" for q in data["scope_questions"]):
+        raise ValueError("M00 cannot close while its candidate denominator is unresolved.")
+    if any(f.get("candidate_scope") == "unresolved" for f in data["product_features"]):
+        raise ValueError("M00 cannot close with a product feature in unresolved scope.")
 
 
 def main() -> int:

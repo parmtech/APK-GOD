@@ -253,6 +253,12 @@ class NativeTests(unittest.TestCase):
                                     max_instructions=10)
             self.assertEqual(result["format"], "ELF")
             self.assertTrue(result["sections"])
+            self.assertTrue(result["symbols"])
+            self.assertIsInstance(result["needed_libraries"], list)
+            self.assertEqual(set(result["imports"]),
+                             {symbol["name"] for symbol in result["symbols"] if symbol["imported"]})
+            self.assertEqual(set(result["exports"]),
+                             {symbol["name"] for symbol in result["symbols"] if symbol["exported"]})
             self.assertEqual(result["instruction_count"], 10)
             self.assertEqual(result["status"], "partial")
             self.assertTrue(result["disassembly_coverage"]["limit_reached"])
